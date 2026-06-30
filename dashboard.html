@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Historical Ledger - Premium Dashboard</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;900&family=Montserrat:wght@400;500;600;700&display=swap"
+            rel="stylesheet">
+      <style>
+            body {
+                  background-color: #0a1c36;
+                  color: #0a1c36;
+                  font-family: 'Montserrat', sans-serif;
+                  background-image: radial-gradient(circle, rgba(244, 235, 208, 0.12) 1px, transparent 1px);
+                  background-size: 30px 30px;
+                  min-height: 100vh;
+            }
+
+            .parchment-panel {
+                  background-color: #f4ebd0;
+                  border: 4px double #0a1c36;
+                  outline: 1px solid #c5a059;
+                  outline-offset: -8px;
+                  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6);
+                  position: relative;
+            }
+
+            .table-row {
+                  transition: all 0.2s ease;
+                  border-bottom: 1px solid rgba(10, 28, 54, 0.15);
+            }
+
+            .table-row:hover {
+                  background: rgba(197, 160, 89, 0.15);
+            }
+
+            ::-webkit-scrollbar {
+                  width: 8px;
+                  height: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                  background: #f4ebd0;
+                  border-left: 1px solid #0a1c36;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                  background: #0a1c36;
+            }
+      </style>
+</head>
+
+<body class="p-4 md:p-8">
+
+      <div class="max-w-7xl mx-auto">
+            <header class="flex flex-col md:flex-row justify-between items-center mb-8 parchment-panel p-6">
+                  <div class="text-center md:text-left">
+                        <h1 class="font-['Cinzel'] text-2xl md:text-3xl font-black text-[#801414] tracking-wider mb-1">
+                              ★ RAFFLE ARCHIVE LEDGER ★
+                        </h1>
+                        <p class="text-xs text-slate-700 font-medium italic">250th Anniversary Live Registry &
+                              Participant Management</p>
+                  </div>
+                  <div class="mt-4 md:mt-0 flex items-center">
+                        <div class="bg-[#801414] text-[#f4ebd0] px-5 py-2 border-2 border(#0a1c36) shadow-sm">
+                              <span class="text-[9px] uppercase tracking-widest block font-bold opacity-80">Total
+                                    Registered Entries</span>
+                              <span id="totalCount" class="font-['Cinzel'] text-2xl font-bold">0</span>
+                        </div>
+                  </div>
+            </header>
+
+            <div id="loading" class="text-center py-20 bg-[#f4ebd0] parchment-panel max-w-md mx-auto">
+                  <svg class="animate-spin h-8 w-8 text-[#801414] mx-auto mb-3" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                  </svg>
+                  <p class="font-['Cinzel'] tracking-widest text-xs font-bold text-vNavy animate-pulse">Accessing Server
+                        Records...</p>
+            </div>
+
+            <div id="tableContainer" class="hidden parchment-panel overflow-x-auto p-2">
+                  <table class="w-full text-left border-collapse">
+                        <thead>
+                              <tr class="bg-[#0a1c36] text-[#f4ebd0] border-b border-[#c5a059]">
+                                    <th class="p-4 font-['Cinzel'] text-xs tracking-wider uppercase">#</th>
+                                    <th class="p-4 font-['Cinzel'] text-xs tracking-wider uppercase">Registration Date
+                                    </th>
+                                    <th class="p-4 font-['Cinzel'] text-xs tracking-wider uppercase">Participant Full
+                                          Name</th>
+                                    <th class="p-4 font-['Cinzel'] text-xs tracking-wider uppercase">Mobile Number</th>
+                                    <th class="p-4 font-['Cinzel'] text-xs tracking-wider uppercase text-center">
+                                          Uploaded Photo</th>
+                              </tr>
+                        </thead>
+                        <tbody id="tableBody" class="text-xs font-semibold text-[#0a1c36]">
+                        </tbody>
+                  </table>
+            </div>
+      </div>
+
+      <script>
+            const password = prompt("Admin Authentication Required:");
+            if (password !== "admin123") {
+                  document.body.innerHTML = "<div class='h-screen flex items-center justify-center bg-[#0a1c36]'><h2 class='font-[\"Cinzel\"] text-3xl text-[#801414] tracking-widest'>ACCESS DENIED</h2></div>";
+                  throw new Error("Wrong Password");
+            }
+
+            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVs03bJ2tVpOC4SWiOQK8pNMYiLv4cy6_4JvZPHzgjyIit1vgNbQU9nP4Eaz37X0xs7w/exec";
+
+            function getDriveThumbnail(url) {
+                  const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                  if (match && match[1]) {
+                        return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w200`;
+                  }
+                  return null;
+            }
+
+            fetch(GOOGLE_SCRIPT_URL)
+                  .then(response => response.json())
+                  .then(data => {
+                        document.getElementById('loading').classList.add('hidden');
+                        document.getElementById('tableContainer').classList.remove('hidden');
+
+                        const tbody = document.getElementById('tableBody');
+                        document.getElementById('totalCount').innerText = data.length - 1;
+
+                        for (let i = 1; i < data.length; i++) {
+                              const rowData = data[i];
+                              const dateObj = new Date(rowData[0]);
+                              const formattedDate = `${dateObj.toLocaleDateString()} - <span class="opacity-70 font-normal">${dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>`;
+
+                              const name = rowData[1] || "N/A";
+                              const mobile = rowData[2] || "N/A";
+                              const fileUrl = rowData[3];
+
+                              let photoHtml = `<span class="text-[11px] opacity-40 italic">No File</span>`;
+
+                              if (fileUrl && fileUrl.includes("drive.google.com")) {
+                                    const thumbUrl = getDriveThumbnail(fileUrl);
+                                    if (thumbUrl) {
+                                          photoHtml = `
+                                                <a href="${fileUrl}" target="_blank" class="inline-block group transform hover:scale-105 transition-all">
+                                                      <div class="w-14 h-14 border border-[#0a1c36] p-0.5 bg-white shadow-sm relative overflow-hidden">
+                                                            <img src="${thumbUrl}" alt="User Upload" class="w-full h-full object-cover">
+                                                            <div class="absolute inset-0 bg-[#0a1c36]/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                                  <span class="text-[8px] text-white bg-[#801414] px-1 py-0.5 uppercase">View</span>
+                                                            </div>
+                                                      </div>
+                                                </a>`;
+                                    } else {
+                                          photoHtml = `<a href="${fileUrl}" target="_blank" class="text-blue-800 underline text-[11px]">Open File Link</a>`;
+                                    }
+                              }
+
+                              const row = `
+                              <tr class="table-row">
+                                    <td class="p-4 font-bold opacity-50">${i}</td>
+                                    <td class="p-4">${formattedDate}</td>
+                                    <td class="p-4 font-bold tracking-wide uppercase text-slate-900">${name}</td>
+                                    <td class="p-4 tracking-wider">${mobile}</td>
+                                    <td class="p-4 text-center">${photoHtml}</td>
+                              </tr>`;
+
+                              tbody.insertAdjacentHTML('afterbegin', row);
+                        }
+                  })
+                  .catch(err => {
+                        document.getElementById('loading').innerHTML = `<p class="text-vRed font-bold p-4">Error loading data. Make sure Web App is deployed as "Anyone".</p>`;
+                  });
+      </script>
+</body>
+
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Success - Vintage 3D Raffle</title>
+      <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;900&family=Montserrat:wght@400;600;800&display=swap"
+            rel="stylesheet">
+      <script src="https://cdn.tailwindcss.com"></script>
+
+      <script>
+            tailwind.config = {
+                  theme: {
+                        extend: {
+                              colors: {
+                                    vNavy: '#0f2c59',
+                                    vRed: '#8c1c1c',
+                                    vBg: '#e6d5b8',
+                                    vGold: '#d4af37',
+                              }
+                        }
+                  }
+            }
+      </script>
+
+      <style>
+            .video-bg {
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  object-fit: cover;
+                  z-index: -2;
+            }
+
+            body {
+                  margin: 0;
+                  min-height: 100vh;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  font-family: 'Montserrat', sans-serif;
+                  background-color: rgba(10, 28, 58, 0.6);
+                  perspective: 1200px;
+                  overflow: hidden;
+                  color: #0f2c59;
+            }
+
+            .glass-card {
+                  background: rgba(230, 213, 184, 0.85);
+                  backdrop-filter: blur(16px);
+                  -webkit-backdrop-filter: blur(16px);
+                  border: 2px solid rgba(212, 175, 55, 0.5);
+                  box-shadow: 0 20px 50px rgba(15, 44, 89, 0.5), inset 0 0 30px rgba(212, 175, 55, 0.3);
+                  border-radius: 12px;
+                  transform-style: preserve-3d;
+                  animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            }
+
+            @keyframes popIn {
+                  0% {
+                        transform: scale(0.5) translateY(100px) rotateX(-20deg);
+                        opacity: 0;
+                  }
+
+                  100% {
+                        transform: scale(1) translateY(0) rotateX(0);
+                        opacity: 1;
+                  }
+            }
+
+            .pop-out {
+                  transform: translateZ(50px);
+            }
+
+            .magic-btn {
+                  background: #0f2c59;
+                  border: 2px solid #d4af37;
+                  color: #e6d5b8;
+                  transition: all 0.3s ease;
+            }
+
+            .magic-btn:hover {
+                  background: rgba(15, 44, 89, 0.9);
+                  box-shadow: 0 10px 20px rgba(15, 44, 89, 0.4), 0 0 15px rgba(212, 175, 55, 0.4);
+                  transform: translateZ(20px) scale(1.02);
+            }
+
+            .particles {
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  pointer-events: none;
+                  z-index: -1;
+                  background-image: radial-gradient(circle, #d4af37 1px, transparent 1px);
+                  background-size: 60px 60px;
+                  opacity: 0.15;
+                  animation: floatParticles 25s linear infinite;
+            }
+
+            @keyframes floatParticles {
+                  from {
+                        transform: translateY(0);
+                  }
+
+                  to {
+                        transform: translateY(-100%);
+                  }
+            }
+      </style>
+</head>
+
+<body>
+      <video autoplay loop muted playsinline class="video-bg">
+            <source src="/WWW/videoplayback.mp4" type="video/mp4">
+      </video>
+
+      <div class="particles"></div>
+
+      <div class="glass-card w-[90%] max-w-md p-8 md:p-12 text-center relative z-10 m-4">
+
+            <div class="pop-out">
+                  <div
+                        class="mx-auto w-20 h-20 md:w-24 md:h-24 bg-[#15803d] rounded-full flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(21,128,61,0.5)] border-4 border-[#e6d5b8]">
+                        <svg class="w-10 h-10 md:w-12 md:h-12 text-[#e6d5b8]" fill="none" stroke="currentColor"
+                              viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7">
+                              </path>
+                        </svg>
+                  </div>
+
+                  <div
+                        class="inline-block font-['Cinzel'] text-xs font-bold tracking-[0.3em] text-vNavy uppercase mb-2">
+                        ★ SUCCESS ★
+                  </div>
+
+                  <h1 class="font-['Cinzel'] text-3xl md:text-4xl font-black text-vRed drop-shadow-sm mb-4">
+                        ENTRY CONFIRMED
+                  </h1>
+
+                  <p class="text-sm md:text-base font-medium text-vNavy/90 leading-relaxed mb-8">
+                        Thank you for joining the 250th Grand Raffle.<br>Your details and photo have been securely
+                        registered in our system.
+                  </p>
+
+                  <a href="Index.html"
+                        class="magic-btn inline-block w-full font-['Cinzel'] font-bold tracking-[0.15em] text-sm md:text-md py-3 md:py-4 px-6 rounded-sm uppercase">
+                        RETURN TO HOME
+                  </a>
+            </div>
+      </div>
+</body>
+
+</html>

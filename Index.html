@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Raffle</title>
+      <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;900&family=Montserrat:wght@400;600;800&display=swap"
+            rel="stylesheet">
+      <script src="https://cdn.tailwindcss.com"></script>
+
+      <script>
+            tailwind.config = {
+                  theme: {
+                        extend: {
+                              colors: {
+                                    vNavy: '#0f2c59',
+                                    vRed: '#8c1c1c',
+                                    vBg: '#e6d5b8',
+                                    vGold: '#d4af37',
+                              }
+                        }
+                  }
+            }
+      </script>
+
+      <style>
+            .video-bg {
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  object-fit: cover;
+                  z-index: -2;
+            }
+
+            body {
+                  margin: 0;
+                  min-height: 100vh;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  font-family: 'Montserrat', sans-serif;
+                  background-color: rgba(10, 28, 58, 0.6);
+                  perspective: 1200px;
+                  overflow-x: hidden;
+                  color: #0f2c59;
+            }
+
+            .glass-card {
+                  background: rgba(230, 213, 184, 0.85);
+                  backdrop-filter: blur(16px);
+                  -webkit-backdrop-filter: blur(16px);
+                  border: 2px solid rgba(140, 28, 28, 0.3);
+                  box-shadow: 0 20px 50px rgba(15, 44, 89, 0.5), inset 0 0 20px rgba(212, 175, 55, 0.2);
+                  border-radius: 12px;
+                  transform-style: preserve-3d;
+                  transition: transform 0.1s ease-out;
+            }
+
+            .pop-out-1 {
+                  transform: translateZ(40px);
+            }
+
+            .pop-out-2 {
+                  transform: translateZ(60px);
+            }
+
+            .pop-out-3 {
+                  transform: translateZ(80px);
+            }
+
+            @media (max-width: 768px) {
+                  .pop-out-1 {
+                        transform: translateZ(20px);
+                  }
+
+                  .pop-out-2 {
+                        transform: translateZ(30px);
+                  }
+
+                  .pop-out-3 {
+                        transform: translateZ(40px);
+                  }
+
+                  h1 {
+                        font-size: 3rem !important;
+                  }
+
+                  h2 {
+                        font-size: 1.25rem !important;
+                  }
+            }
+
+            .magic-input {
+                  background: rgba(255, 255, 255, 0.4);
+                  border: 2px solid rgba(15, 44, 89, 0.3);
+                  color: #0f2c59;
+                  font-weight: 600;
+                  transition: all 0.3s ease;
+            }
+
+            .magic-input::placeholder {
+                  color: rgba(15, 44, 89, 0.5);
+            }
+
+            .magic-input:focus {
+                  outline: none;
+                  background: rgba(255, 255, 255, 0.7);
+                  border-color: #8c1c1c;
+                  box-shadow: 0 10px 20px rgba(140, 28, 28, 0.2);
+                  transform: translateZ(10px);
+            }
+
+            .upload-box {
+                  background: rgba(255, 255, 255, 0.3);
+                  border: 2px dashed rgba(15, 44, 89, 0.5);
+                  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+
+            .upload-box:hover {
+                  border-color: #8c1c1c;
+                  background: rgba(140, 28, 28, 0.05);
+                  box-shadow: 0 10px 25px rgba(140, 28, 28, 0.15);
+                  transform: translateZ(20px) scale(1.02);
+            }
+
+            .social-btn {
+                  background: rgba(255, 255, 255, 0.4);
+                  border: 2px solid #0f2c59;
+                  color: #0f2c59;
+                  transition: all 0.3s ease;
+            }
+
+            .social-btn:hover {
+                  background: #0f2c59;
+                  color: #e6d5b8;
+                  border-color: #d4af37;
+                  box-shadow: 0 10px 15px rgba(15, 44, 89, 0.3);
+            }
+
+            .magic-submit {
+                  background: linear-gradient(45deg, #8c1c1c, #b32424, #8c1c1c);
+                  background-size: 200% 200%;
+                  animation: gradientBG 3s ease infinite;
+                  border: 2px solid #0f2c59;
+                  color: #e6d5b8;
+                  transition: all 0.3s ease;
+                  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            }
+
+            .magic-submit:hover {
+                  box-shadow: 0 15px 30px rgba(140, 28, 28, 0.5), 0 0 20px rgba(212, 175, 55, 0.4);
+                  transform: translateZ(40px) scale(1.02);
+            }
+
+            .particles {
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  pointer-events: none;
+                  z-index: -1;
+                  background-image: radial-gradient(circle, #d4af37 1px, transparent 1px);
+                  background-size: 60px 60px;
+                  opacity: 0.15;
+                  animation: floatParticles 25s linear infinite;
+            }
+
+            @keyframes floatParticles {
+                  from {
+                        transform: translateY(0);
+                  }
+
+                  to {
+                        transform: translateY(-100%);
+                  }
+            }
+      </style>
+</head>
+
+<body>
+      <video autoplay loop muted playsinline class="video-bg">
+            <source src="videoplayback.mp4" type="video/mp4">
+      </video>
+
+      <div class="particles"></div>
+
+      <div id="errorModal"
+            class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeError()"></div>
+            <div
+                  class="glass-card relative z-10 w-[85%] max-w-sm p-6 md:p-8 text-center transform scale-95 transition-transform duration-300 border-vRed">
+                  <div
+                        class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-red-100 border-2 border-vRed mb-4 shadow-lg">
+                        <svg class="h-8 w-8 text-vRed" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                  </div>
+                  <h3 class="font-['Cinzel'] text-xl font-bold text-vRed mb-2 drop-shadow-sm">Registration Error</h3>
+                  <p id="errorMessage" class="text-xs md:text-sm text-vNavy/90 mb-6 font-semibold leading-relaxed"></p>
+                  <button onclick="closeError()"
+                        class="magic-submit w-full py-3 text-xs md:text-sm font-bold rounded-sm uppercase tracking-[0.1em]">
+                        Try Again
+                  </button>
+            </div>
+      </div>
+
+      <div id="tiltCard" class="glass-card w-[90%] max-w-lg p-6 md:p-10 relative z-10 m-4">
+
+            <div class="text-center mb-6 md:mb-8 pop-out-3">
+                  <div
+                        class="inline-block font-['Cinzel'] text-[10px] md:text-xs font-bold tracking-[0.3em] text-vNavy uppercase mb-2">
+                        ★ CELEBRATING ★</div>
+                  <h1 class="font-['Cinzel'] text-5xl md:text-6xl font-black text-vRed drop-shadow-md mb-2">
+                        250<span class="text-xl md:text-2xl align-top">TH</span>
+                  </h1>
+                  <h2 class="font-['Cinzel'] text-xl md:text-2xl font-bold tracking-[0.2em] uppercase text-vNavy">GRAND
+                        RAFFLE</h2>
+                  <p class="text-[10px] md:text-xs font-semibold italic text-vNavy/70 mt-2">Honoring Our Past. Inspiring
+                        Our Future.</p>
+            </div>
+
+            <form id="magicForm" class="space-y-4 md:space-y-6 pop-out-1" onsubmit="event.preventDefault();">
+
+                  <div class="pop-out-2 group">
+                        <label
+                              class="block text-[10px] md:text-xs font-bold tracking-wider text-vNavy mb-1.5 md:mb-2 uppercase">
+                              <span class="font-['Cinzel'] text-vRed text-xs md:text-sm">➊</span> Full Name
+                        </label>
+                        <input type="text" id="fullName" required placeholder="Enter your name"
+                              class="magic-input w-full p-3 md:p-3.5 rounded-sm text-xs md:text-sm tracking-wide">
+                  </div>
+
+                  <div class="pop-out-2 group">
+                        <label
+                              class="block text-[10px] md:text-xs font-bold tracking-wider text-vNavy mb-1.5 md:mb-2 uppercase">
+                              <span class="font-['Cinzel'] text-vRed text-xs md:text-sm">➋</span> Mobile Number
+                        </label>
+                        <input type="tel" id="mobileNumber" required placeholder="+1 (555) 000-0000"
+                              class="magic-input w-full p-3 md:p-3.5 rounded-sm text-xs md:text-sm tracking-wide">
+                  </div>
+
+                  <div class="pop-out-2">
+                        <label
+                              class="block text-[10px] md:text-xs font-bold tracking-wider text-vNavy mb-1.5 md:mb-2 uppercase">
+                              <span class="font-['Cinzel'] text-vRed text-xs md:text-sm">➌</span> Upload Photo
+                        </label>
+                        <div id="dropzoneBox"
+                              class="upload-box relative p-4 md:p-6 rounded-sm text-center cursor-pointer">
+                              <input type="file" id="photoUpload" required accept="image/*"
+                                    onchange="handleMagicUpload(this)"
+                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                              <div id="dropzoneContent" class="space-y-2 pointer-events-none pop-out-1">
+                                    <svg id="uploadIcon"
+                                          class="mx-auto h-7 w-7 md:h-9 md:w-9 text-vNavy transition-colors"
+                                          stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <p id="uploadText"
+                                          class="text-[10px] md:text-xs font-bold tracking-wide uppercase text-vNavy">
+                                          Snap or Select Image</p>
+                              </div>
+                        </div>
+                  </div>
+
+                  <div class="pop-out-2 space-y-2 md:space-y-3">
+                        <label
+                              class="block text-[10px] md:text-xs font-bold tracking-wider text-vNavy mb-2 uppercase flex justify-between">
+                              <span><span class="font-['Cinzel'] text-vRed text-xs md:text-sm">➍</span> Follow All 3
+                                    Pages</span>
+                              <span id="socialError"
+                                    class="text-vRed text-[8px] md:text-[10px] animate-pulse hidden">Unlock all to
+                                    proceed!</span>
+                        </label>
+
+                        <div
+                              class="flex items-center justify-between bg-white/30 border border-vNavy/20 p-2 md:p-3 rounded-sm transition-colors hover:bg-white/40">
+                              <div class="text-left">
+                                    <p
+                                          class="text-[8px] md:text-[9px] font-bold text-vRed uppercase tracking-widest mb-0.5">
+                                          Sponsor 1</p>
+                                    <p class="text-[10px] md:text-xs font-black text-vNavy tracking-wide">The Glory
+                                          Media</p>
+                              </div>
+                              <button type="button"
+                                    onclick="unlockPortal('fbPage', this, 'https://www.facebook.com/TheGloryMedia')"
+                                    class="social-btn px-4 py-2 rounded-sm relative group text-[9px] md:text-[10px] font-bold uppercase tracking-wider">
+                                    <span class="z-10 relative">Follow</span>
+                                    <div
+                                          class="portal-check absolute -top-1.5 -right-1.5 text-white bg-green-600 rounded-full w-4 h-4 flex items-center justify-center opacity-0 text-[9px] shadow-sm">
+                                          ✔</div>
+                              </button>
+                        </div>
+
+                        <div
+                              class="flex items-center justify-between bg-white/30 border border-vNavy/20 p-2 md:p-3 rounded-sm transition-colors hover:bg-white/40">
+                              <div class="text-left">
+                                    <p
+                                          class="text-[8px] md:text-[9px] font-bold text-vRed uppercase tracking-widest mb-0.5">
+                                          Sponsor 2</p>
+                                    <p class="text-[10px] md:text-xs font-black text-vNavy tracking-wide">Merced County
+                                          Matters</p>
+                              </div>
+                              <button type="button"
+                                    onclick="unlockPortal('fbGroup', this, 'https://www.facebook.com/MercedCountyMatters')"
+                                    class="social-btn px-4 py-2 rounded-sm relative group text-[9px] md:text-[10px] font-bold uppercase tracking-wider">
+                                    <span class="z-10 relative">Follow</span>
+                                    <div
+                                          class="portal-check absolute -top-1.5 -right-1.5 text-white bg-green-600 rounded-full w-4 h-4 flex items-center justify-center opacity-0 text-[9px] shadow-sm">
+                                          ✔</div>
+                              </button>
+                        </div>
+
+                        <div
+                              class="flex items-center justify-between bg-white/30 border border-vNavy/20 p-2 md:p-3 rounded-sm transition-colors hover:bg-white/40">
+                              <div class="text-left">
+                                    <p
+                                          class="text-[8px] md:text-[9px] font-bold text-vRed uppercase tracking-widest mb-0.5">
+                                          Sponsor 3</p>
+                                    <p class="text-[10px] md:text-xs font-black text-vNavy tracking-wide">Peace & Grace
+                                          Insurance</p>
+                              </div>
+                              <button type="button"
+                                    onclick="unlockPortal('fbShare', this, 'https://www.facebook.com/profile.php?id=61555882591747')"
+                                    class="social-btn px-4 py-2 rounded-sm relative group text-[9px] md:text-[10px] font-bold uppercase tracking-wider">
+                                    <span class="z-10 relative">Follow</span>
+                                    <div
+                                          class="portal-check absolute -top-1.5 -right-1.5 text-white bg-green-600 rounded-full w-4 h-4 flex items-center justify-center opacity-0 text-[9px] shadow-sm">
+                                          ✔</div>
+                              </button>
+                        </div>
+                  </div>
+
+                  <div class="pt-4 md:pt-6 pop-out-3">
+                        <button type="button" onclick="castSpellAndSubmit()" id="submitBtn"
+                              class="magic-submit w-full font-['Cinzel'] font-black tracking-[0.1em] md:tracking-[0.15em] text-sm md:text-md py-3 md:py-4 px-4 md:px-6 rounded-sm uppercase">
+                              ★ CLICK SUBMIT TO ENTER ★
+                        </button>
+                  </div>
+            </form>
+      </div>
+
+      <script>
+            function showError(msg) {
+                  document.getElementById('errorMessage').innerText = msg;
+                  const modal = document.getElementById('errorModal');
+                  modal.classList.remove('hidden');
+                  setTimeout(() => {
+                        modal.classList.remove('opacity-0');
+                        modal.querySelector('.glass-card').classList.remove('scale-95');
+                  }, 10);
+            }
+
+            function closeError() {
+                  const modal = document.getElementById('errorModal');
+                  modal.classList.add('opacity-0');
+                  modal.querySelector('.glass-card').classList.add('scale-95');
+                  setTimeout(() => {
+                        modal.classList.add('hidden');
+                  }, 300);
+            }
+
+            function handleMagicUpload(input) {
+                  const box = document.getElementById('dropzoneBox');
+                  const text = document.getElementById('uploadText');
+                  const icon = document.getElementById('uploadIcon');
+
+                  if (input.files && input.files[0]) {
+                        const fileName = input.files[0].name;
+                        box.style.borderColor = '#0f2c59';
+                        box.style.background = 'rgba(255, 255, 255, 0.6)';
+                        icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />`;
+                        icon.classList.remove('text-vNavy');
+                        icon.classList.add('text-green-700');
+                        text.innerHTML = `<span class="text-green-700 block mb-1">✔ Image Selected</span> <span class="text-vNavy text-[10px] lowercase truncate block max-w-[180px] mx-auto opacity-80">${fileName}</span>`;
+                  }
+            }
+
+            const portals = { fbPage: false, fbGroup: false, fbShare: false };
+
+            function unlockPortal(platform, btn, link) {
+                  window.open(link, '_blank');
+                  portals[platform] = true;
+
+                  btn.style.background = '#0f2c59';
+                  btn.style.color = '#e6d5b8';
+                  btn.style.borderColor = '#d4af37';
+                  btn.querySelector('span.z-10').innerText = "FOLLOWED";
+
+                  const check = btn.querySelector('.portal-check');
+                  check.classList.remove('opacity-0');
+                  check.classList.add('opacity-100');
+
+                  document.getElementById('socialError').classList.add('hidden');
+            }
+
+            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVs03bJ2tVpOC4SWiOQK8pNMYiLv4cy6_4JvZPHzgjyIit1vgNbQU9nP4Eaz37X0xs7w/exec";
+
+            async function castSpellAndSubmit() {
+                  const form = document.getElementById('magicForm');
+                  const submitBtn = document.getElementById('submitBtn');
+                  const socialError = document.getElementById('socialError');
+                  const card = document.getElementById('tiltCard');
+
+                  if (!form.checkValidity()) {
+                        form.reportValidity();
+                        return;
+                  }
+
+                  if (!portals.fbPage || !portals.fbGroup || !portals.fbShare) {
+                        socialError.classList.remove('hidden');
+                        return;
+                  }
+
+                  const fullName = document.getElementById('fullName').value;
+                  const mobileNumber = document.getElementById('mobileNumber').value;
+                  const photoInput = document.getElementById('photoUpload');
+
+                  submitBtn.innerHTML = "★ CHECKING RECORDS... ★";
+                  submitBtn.style.pointerEvents = 'none';
+
+                  if (photoInput.files.length > 0) {
+                        const file = photoInput.files[0];
+                        const reader = new FileReader();
+
+                        reader.onload = async function (e) {
+                              const base64Data = e.target.result.split(',')[1];
+                              const payload = {
+                                    fullName: fullName,
+                                    mobileNumber: mobileNumber,
+                                    photoName: file.name,
+                                    photoMimeType: file.type,
+                                    photoData: base64Data
+                              };
+                              await sendDataToServer(payload, submitBtn, card);
+                        };
+                        reader.readAsDataURL(file);
+                  }
+            }
+
+            async function sendDataToServer(payload, submitBtn, card) {
+                  try {
+                        const response = await fetch(GOOGLE_SCRIPT_URL, {
+                              method: 'POST',
+                              body: JSON.stringify(payload)
+                        });
+                        const result = await response.json();
+
+                        if (result.status === "success") {
+                              submitBtn.innerHTML = "✔ ENTRY CONFIRMED ✔";
+                              submitBtn.style.background = '#15803d';
+                              submitBtn.style.borderColor = '#15803d';
+
+                              card.style.transition = 'all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                              card.style.transform = 'translateY(-120vh) rotateX(60deg) scale(0.6)';
+                              card.style.opacity = '0';
+
+                              setTimeout(() => {
+                                    window.location.href = "success.html";
+                              }, 1000);
+                        } else if (result.status === "duplicate") {
+                              showError("This Name or Mobile Number is already registered in our system. Only one entry is allowed per person!");
+                              submitBtn.innerHTML = "★ CLICK SUBMIT TO ENTER ★";
+                              submitBtn.style.pointerEvents = 'auto';
+                        } else {
+                              showError("Server Error: " + result.message);
+                              submitBtn.innerHTML = "★ CLICK SUBMIT TO ENTER ★";
+                              submitBtn.style.pointerEvents = 'auto';
+                        }
+                  } catch (error) {
+                        showError("Connection Error. Please check your internet connection and try again.");
+                        submitBtn.innerHTML = "★ CLICK SUBMIT TO ENTER ★";
+                        submitBtn.style.pointerEvents = 'auto';
+                  }
+            }
+      </script>
+</body>
+
+</html>
